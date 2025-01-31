@@ -23,19 +23,16 @@ public class FriendshipService {
 
     // Метод за добавяне на приятел
     public Friendship addFriend(Long userId, Long friendId) {
-        // Проверка дали потребителите съществуват
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
         User friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new RuntimeException("Friend not found with ID: " + friendId));
 
-        // Проверка дали вече са приятели
         boolean alreadyFriends = friendshipRepository.existsByUserAndFriend(user, friend);
         if (alreadyFriends) {
             throw new RuntimeException("Users are already friends");
         }
 
-        // Създаване на приятелство
         Friendship friendship = new Friendship();
         friendship.setUser(user);
         friendship.setFriend(friend);
@@ -43,7 +40,6 @@ public class FriendshipService {
         return friendshipRepository.save(friendship);
     }
 
-    // Метод за връщане на списък с приятели на потребител
     public List<UserDTO> getFriends(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));

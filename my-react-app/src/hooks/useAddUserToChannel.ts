@@ -36,7 +36,7 @@ export const useAddUserToChannel = ({ fetchChannelUsers }: UseAddUserToChannelPr
       }
 
       alert(`Потребителят беше добавен в ${selectedChannel.name}!`)
-      fetchChannelUsers(selectedChannel.id) // ✅ Refresh users in the channel
+      fetchChannelUsers(selectedChannel.id)
     } catch (err) {
       setError((err as Error).message)
     } finally {

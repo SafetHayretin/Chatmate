@@ -19,7 +19,7 @@ public class Message {
     private User receiver;
 
     @ManyToOne
-    @JoinColumn(name = "channel_id", nullable = false)
+    @JoinColumn(name = "channel_id")
     private Channel channel;
 
     @Column(nullable = false)

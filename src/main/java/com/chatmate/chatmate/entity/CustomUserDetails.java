@@ -37,26 +37,26 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail(); // Use email as the login username
+        return user.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Update if you add account expiration logic
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Update if you add account locking logic
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Update if you add credential expiration logic
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Update if you add an "enabled" field
+        return true;
     }
 }

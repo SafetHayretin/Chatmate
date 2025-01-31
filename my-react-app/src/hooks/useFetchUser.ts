@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { Channel, Friend } from '../types/messeges.types'
+import { useState } from 'react'
 
 export const useFetch = (url: string) => {
   const [data, setData] = useState<any>(null)
@@ -19,7 +18,7 @@ export const useFetch = (url: string) => {
       const result = await response.json()
       setData(result)
     } catch (err) {
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setIsLoading(false)
     }

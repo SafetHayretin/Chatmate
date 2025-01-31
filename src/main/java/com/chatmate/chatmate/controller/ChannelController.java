@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/channels")
@@ -42,6 +43,7 @@ public class ChannelController {
         List<ChannelDto> channels = channelService.getChannelsByUser(Long.valueOf(userId));
         return ResponseEntity.ok(channels);
     }
+
     @GetMapping("/not-added-users")
     public ResponseEntity<List<UserDTO>> getUsersNotInChannel(
             @CookieValue("user_id") String userId,
@@ -72,10 +74,26 @@ public class ChannelController {
         return ResponseEntity.ok(channel);
     }
 
+    @PutMapping("/{channelId}/rename")
+    public ResponseEntity<ChannelDto> renameChannel(
+            @CookieValue("user_id") String userId,
+            @PathVariable Long channelId,
+            @RequestBody Map<String, String> requestBody) {
+
+        String newName = requestBody.get("newName");
+        ChannelDto updatedChannel = channelService.renameChannel(Long.valueOf(userId), channelId, newName);
+
+        return ResponseEntity.ok(updatedChannel);
+    }
+
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> deleteChannel(@PathVariable Long channelId, @CookieValue("user_id") String userId) {
-        channelService.deleteChannel(channelId, Long.valueOf(userId));
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteChannel(@PathVariable Long channelId, @CookieValue("user_id") String userId) {
+        try {
+            channelService.deleteChannel(channelId, Long.valueOf(userId));
+            return ResponseEntity.ok().body("Каналът беше изтрит успешно.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
     }
 }
 

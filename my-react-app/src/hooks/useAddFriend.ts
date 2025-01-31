@@ -4,7 +4,7 @@ export const useAddFriend = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const sendFriendRequest = async (friendId: string, fetchFriends: () => void) => {
+  const sendFriendRequest = async (friendId: string) => {
     setLoading(true)
     setError(null)
 
@@ -18,7 +18,6 @@ export const useAddFriend = () => {
 
       if (!response.ok) throw new Error('Неуспешно добавяне на приятел')
       alert('Потребителят беше добавен успешно!')
-      fetchFriends()
     } catch (err) {
       setError((err as Error).message)
     } finally {

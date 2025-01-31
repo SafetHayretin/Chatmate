@@ -35,10 +35,18 @@ public class MessageController {
     }
 
     @GetMapping("/direct")
-    public ResponseEntity<List<Message>> getDirectMessages(
+    public ResponseEntity<List<MessageDTO>> getDirectMessages(
             @CookieValue("user_id") String userId,
             @RequestParam Long userId2) {
-        List<Message> messages = messageService.getDirectMessages(Long.valueOf(userId), userId2);
+        List<MessageDTO> messages = messageService.getDirectMessages(Long.valueOf(userId), userId2)
+                .stream()
+                .map(msg -> new MessageDTO(
+                        msg.getId(),
+                        msg.getSender().getUsername(),
+                        msg.getContent(),
+                        msg.getReceiver(),
+                        msg.getTimestamp()))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(messages);
     }
@@ -49,15 +57,14 @@ public class MessageController {
             @RequestBody MessageRequest request) {
 
         if (userId == null) {
-            return ResponseEntity.status(401).build(); // Unauthorized
+            return ResponseEntity.status(401).build();
         }
 
         Message message = messageService.sendMessageToChannel(Long.valueOf(userId), request.getChannelId(), request.getContent());
 
-        // Convert Message to MessageDTO
         MessageDTO messageDTO = new MessageDTO(
                 message.getId(),
-                message.getSender().getUsername(), // ✅ Extract only the username
+                message.getSender().getUsername(),
                 message.getContent(),
                 message.getChannel().getName(),
                 message.getTimestamp()
@@ -67,13 +74,20 @@ public class MessageController {
     }
 
     @PostMapping("/send-direct")
-    public ResponseEntity<Message> sendDirectMessage(
+    public ResponseEntity<MessageDTO> sendDirectMessage(
             @CookieValue("user_id") String userId,
-            @RequestParam Long receiverId,
-            @RequestParam String content) {
-        Message message = messageService.sendDirectMessage(Long.valueOf(userId), receiverId, content);
+            @RequestBody MessageRequest request) {
+        Message message = messageService.sendDirectMessage(Long.valueOf(userId), request.getReceiverId(), request.getContent());
 
-        return ResponseEntity.ok(message);
+        MessageDTO messageDTO = new MessageDTO(
+                message.getId(),
+                message.getSender().getUsername(),
+                message.getContent(),
+                message.getReceiver(),
+                message.getTimestamp()
+        );
+
+        return ResponseEntity.ok(messageDTO);
     }
 }
 

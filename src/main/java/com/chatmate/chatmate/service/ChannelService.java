@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +51,7 @@ public class ChannelService {
 
         channelRoleRepository.save(ownerRole);
 
-        return new ChannelDto(channel);
+        return new ChannelDto(channel, RoleName.OWNER.toString());
     }
 
     public List<UserDTO> getUsersNotInChannel(Long userId, Long channelId) {
@@ -68,17 +69,19 @@ public class ChannelService {
     }
 
     public List<ChannelDto> getAllChannels() {
-        return channelRepository.findAll().stream()
+        return channelRepository.findByDeletedFalse().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     public List<ChannelDto> getChannelsByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        List<ChannelRole> userRoles = channelRoleRepository.findByUserIdAndChannelNotDeleted(userId);
 
-        return channelRoleRepository.findAllByUser(user).stream()
-                .map(channelRole -> convertToDto(channelRole.getChannel())) // Convert to DTO
+        return userRoles.stream()
+                .map(role -> new ChannelDto(
+                        role.getChannel(),
+                        role.getRole().toString()
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -93,25 +96,38 @@ public class ChannelService {
                 .map(channelRole -> new UserDTO(
                         channelRole.getUser().getId(),
                         channelRole.getUser().getUsername(),
-                        channelRole.getRole().name()))  // <-- Добавяме ролята
+                        channelRole.getRole().name()))
                 .collect(Collectors.toList());
     }
 
-    public void deleteChannel(Long channelId, Long userId) {
+    public ChannelDto renameChannel(Long userId, Long channelId, String newName) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new RuntimeException("Channel not found with ID: " + channelId));
+                .orElseThrow(() -> new RuntimeException("Channel not found"));
 
-        ChannelRole ownerRole = channelRoleRepository.findByUserAndChannel(
-                userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")),
-                channel
-        ).orElseThrow(() -> new RuntimeException("User is not a member of the channel"));
-
-        if (ownerRole.getRole() != RoleName.OWNER) {
-            throw new RuntimeException("Only the channel owner can delete the channel");
+        if (!channel.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized: Only Owner or Admin can rename the channel.");
         }
 
-        channel.setDeleted(true);
+        channel.setName(newName);
         channelRepository.save(channel);
+
+        return new ChannelDto(channel.getId(), channel.getName());
+    }
+
+    public void deleteChannel(Long id, Long userId) {
+        Optional<Channel> channel = channelRepository.findById(id);
+        if (channel.isEmpty()) {
+            throw new RuntimeException("Channel not found");
+        }
+
+        boolean isOwner = channelRoleRepository.existsByChannelIdAndUserIdAndRole(id, userId, RoleName.OWNER);
+        if (!isOwner) {
+            throw new RuntimeException("Only OWNER can delete channel.");
+        }
+
+        Channel channelToDelete = channel.get();
+        channelToDelete.setDeleted(true);
+        channelRepository.save(channelToDelete);
     }
 
 }

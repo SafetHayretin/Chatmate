@@ -1,6 +1,7 @@
 package com.chatmate.chatmate.dto;
 
 public class MessageRequest {
+    private Long receiverId;
     private Long channelId;
     private String content;
 
@@ -18,5 +19,13 @@ public class MessageRequest {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Long getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
     }
 }

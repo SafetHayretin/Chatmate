@@ -31,7 +31,7 @@ public class FriendshipController {
             @RequestBody FriendRequestDTO request) {
 
         if (userId == null) {
-            return ResponseEntity.status(401).build(); // Unauthorized
+            return ResponseEntity.status(401).build();
         }
 
         Friendship friendship = friendshipService.addFriend(Long.valueOf(userId), request.getFriendId());

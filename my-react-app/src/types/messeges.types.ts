@@ -1,6 +1,7 @@
 export interface Channel {
   id: string
   name: string
+  role: 'OWNER' | 'ADMIN' | 'GUEST'
 }
 
 export interface Friend {

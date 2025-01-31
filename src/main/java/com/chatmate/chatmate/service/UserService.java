@@ -24,10 +24,8 @@ public class UserService {
     public List<User> searchUsers(String query) {
         List<User> result = new ArrayList<>();
 
-        // Търси по username
         userRepository.findByUsernameIgnoreCase(query).ifPresent(result::add);
 
-        // Търси по email, ако вече не е добавен
         userRepository.findByEmailIgnoreCase(query).ifPresent(user -> {
             if (!result.contains(user)) {
                 result.add(user);

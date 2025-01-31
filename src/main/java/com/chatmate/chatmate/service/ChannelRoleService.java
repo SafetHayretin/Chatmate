@@ -44,21 +44,17 @@ public class ChannelRoleService {
         return channelRoleRepository.save(newRole);
     }
     public void removeGuestFromChannel(Long ownerId, Long channelId, Long guestUserId) {
-        // Проверка дали каналът съществува
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new RuntimeException("Channel not found"));
 
-        // Проверка дали потребителят е собственик на канала
         boolean isOwner = channelRoleRepository.existsByUserIdAndChannelIdAndRole(ownerId, channelId, RoleName.OWNER);
         if (!isOwner) {
             throw new RuntimeException("Only the channel owner can remove users");
         }
 
-        // Проверка дали потребителят е гост в канала
         ChannelRole guestRole = channelRoleRepository.findByUserIdAndChannelIdAndRole(guestUserId, channelId, RoleName.GUEST)
                 .orElseThrow(() -> new RuntimeException("User is not a guest in this channel"));
 
-        // Премахване на ГОСТ потребител
         channelRoleRepository.delete(guestRole);
     }
 }

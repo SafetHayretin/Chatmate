@@ -26,19 +26,19 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Encrypt passwords with BCrypt
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for simplicity
+                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**").permitAll() // Allow login and registration
+//                        .requestMatchers("/auth/**").permitAll()
 //                        .anyRequest().authenticated() // Protect all other endpoints
 //                )
 //                .formLogin(form -> form
-//                        .loginPage("/auth/login") // Specify custom login page if needed
+//                        .loginPage("/auth/login")
 //                        .permitAll()
 //                )
 //                .logout(logout -> logout
@@ -46,7 +46,7 @@ public class SecurityConfig {
 //                        .logoutSuccessUrl("/logout-success")
 //                        .permitAll()
 //                )
-                .userDetailsService(customUserDetailsService) // Attach custom user details service
+                .userDetailsService(customUserDetailsService)
                 .build();
 
     }
@@ -56,11 +56,11 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Change this to your frontend URL
+                        .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowCredentials(true)
                         .allowedHeaders("*")
-                        .exposedHeaders("Set-Cookie"); // Allow cookies in response
+                        .exposedHeaders("Set-Cookie");
             }
         };
     }

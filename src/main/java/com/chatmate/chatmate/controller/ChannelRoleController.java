@@ -3,7 +3,6 @@ package com.chatmate.chatmate.controller;
 import com.chatmate.chatmate.entity.ChannelRole;
 import com.chatmate.chatmate.entity.RoleName;
 import com.chatmate.chatmate.service.ChannelRoleService;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
